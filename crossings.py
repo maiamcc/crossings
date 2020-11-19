@@ -1,7 +1,7 @@
 from typing import Dict, Generator, List, Set, Tuple
 
 Wordlist = List[str]
-Pair = Set[str]
+Pair = Tuple[str, str]
 Crossing = Set[Pair]
 CrossingPoint = Tuple[int, int]
 
@@ -89,7 +89,14 @@ def xpoints_for_pair(pair: Pair) -> List[CrossingPoint]:
     (meaning the two words could be placed on a grid such that they
     intersected at this letter).
     """
-    return []
+    res = []
+
+    # this is inefficient but words are short so I don't care
+    for i, ch1 in enumerate(pair[0]):
+        for j, ch2 in enumerate(pair[1]):
+            if ch1 == ch2:
+                res.append((i, j))
+    return res
 
 
 def crossings_from_xpoint_groups(xpoint_groups: Dict[CrossingPoint, Set[Pair]]) -> Set[Crossing]:
