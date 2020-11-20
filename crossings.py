@@ -7,6 +7,17 @@ Crossing = Set[Pair]
 CrossingPoint = Tuple[int, int]
 
 
+def new_pair(wd1: str, wd2: str) -> Pair:
+    if len(wd1) > len(wd2):
+        return wd1, wd2
+    elif len(wd1) < len(wd2):
+        return wd2, wd1
+    elif wd1 < wd2:  # wd1 comes alphabetically before wd2
+        return wd1, wd2
+    else:
+        return wd2, wd1
+
+
 def find_all_crossings(wds: Wordlist) -> Set[Crossing]:
     result = set()
     for len_m, len_n in wds_of_len_m_and_n(wds):
@@ -67,8 +78,6 @@ def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[Pair]:
     """
     Find all possible pairs of one word of length m and one of length n.
     """
-    # Decide about ordering -- canonical ordering is probably, longest first,
-    # if same length then alphabetically first one first.
     pass
 
 
@@ -107,7 +116,7 @@ def xpoints_for_pair(pair: Pair) -> List[CrossingPoint]:
     return res
 
 
-def crossings_from_xpoint_groups(xpoint_groups: Dict[CrossingPoint, Set[Pair]]) -> Set[Crossing]:
+def crossings_from_xpoint_groups(xpoint_groups: Dict[CrossingPoint, List[Pair]]) -> Set[Crossing]:
     """
 
     :param xpoint_groups: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point
