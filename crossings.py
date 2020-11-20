@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Dict, Generator, List, Set, Tuple
 
 Wordlist = List[str]
@@ -50,7 +51,7 @@ def find_crossings(len_m: Wordlist, len_n: Wordlist) -> Set[Crossing]:
     return crossings_from_xpoint_groups(pairs_by_xpoint)
 
 
-def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> Dict[CrossingPoint, Set[Pair]]:
+def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> Dict[CrossingPoint, List[Pair]]:
     """
     Find all possible pairs of one word of length m & one of length n.
 
@@ -62,15 +63,16 @@ def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> Dict[Cro
     return group_by_xpoint(pairs)
 
 
-def find_pairs(len_m: Wordlist, len_n: Wordlist) -> Set[Pair]:
+def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[Pair]:
     """
-    Find all possible pairs of one word of length m and one of length n
-    (order does not matter).
+    Find all possible pairs of one word of length m and one of length n.
     """
+    # Decide about ordering -- canonical ordering is probably, longest first,
+    # if same length then alphabetically first one first.
     pass
 
 
-def group_by_xpoint(pairs: Set[Pair]) -> Dict[CrossingPoint, Set[Pair]]:
+def group_by_xpoint(pairs: List[Pair]) -> Dict[CrossingPoint, List[Pair]]:
     """
     Group all pairs by their valid crossing points. (Note that a single pair may have
     multiple valid crossing points.)
@@ -78,7 +80,13 @@ def group_by_xpoint(pairs: Set[Pair]) -> Dict[CrossingPoint, Set[Pair]]:
     :param pairs: pairs of words to group
     :return: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point
     """
-    pass
+    res = defaultdict(list)
+    for p in pairs:
+        xpoints = xpoints_for_pair(p)
+        for xpt in xpoints:
+            res[xpt].append(p)
+
+    return res
 
 
 def xpoints_for_pair(pair: Pair) -> List[CrossingPoint]:

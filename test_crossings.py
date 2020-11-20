@@ -1,6 +1,6 @@
 import pytest
 
-from crossings import xpoints_for_pair, Pair, CrossingPoint
+from crossings import group_by_xpoint, xpoints_for_pair, Pair, CrossingPoint
 
 from typing import List
 
@@ -28,3 +28,18 @@ class TestXpointsForPair:
                             [(0, 0), (1, 1), (1, 11), (1, 12), (4, 4), (5, 2),
                              (5, 5), (6, 6), (7, 7), (8, 3), (11, 2), (11, 5)]
                             )
+
+
+def test_group_by_xpoint():
+    p0 = ('abcde', 'fghij')     # no xpoints
+    p1 = ('abcxde', 'fgxhij')   # (3,2)
+    p2 = ('abcxdex', 'fgxhij')  # (3,2), (6,2)
+    p3 = ('abxdef', 'ghijklx')  # (2,6)
+
+    expected = {
+        (3, 2): [p1, p2],
+        (6, 2): [p2],
+        (2, 6): [p3]
+    }
+
+    assert group_by_xpoint([p0, p1, p2, p3]) == expected
