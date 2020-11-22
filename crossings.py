@@ -19,15 +19,15 @@ class XpointGroups(dict):
     # untyped languages are PERFECTLY SAFE what could go wrong 😬
     def m(self):
         for v in self.values():
-            return len(v[0])
+            return len(v[0][0])
 
     def n(self):
         for v in self.values():
-            return len(v[1])
+            return len(v[0][1])
 
 
 class Crossing:
-    def __init__(self, pairs: List[Pair], xpoints: List[Tuple[int, int]]):
+    def __init__(self, pairs: Tuple[Pair, Pair], xpoints: Tuple[Tuple[int, int], Tuple[int, int]]):
         if len(pairs) != 2:
             raise TypeError('Need exactly two pairs (got {}: {})'.
                             format(len(pairs), pairs))
@@ -37,6 +37,16 @@ class Crossing:
 
         self.pairs = pairs
         self.xpoints = xpoints
+
+    def __hash__(self): return self.pairs.__hash__() + self.xpoints.__hash__()
+
+    def __eq__(self, other): return self.__hash__() == other.__hash__()
+
+    def __repr__(self):
+        return '{} @ {} & {} @ {}'.format(self.pairs[0], self.xpoints[0],
+                                          self.pairs[1], self.xpoints[1])
+
+
 
 
 Wordlist = List[str]
@@ -161,14 +171,21 @@ def get_reciprocal_xpoints(xpoints: List[CrossingPoint], m: int, n: int) -> Set[
     return res
 
 
-def crossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> Set[Crossing]:
-    reciprocal_xpoints = get_reciprocal_xpoints(xpoint_groups.keys(), xpoint_groups.m(), xpoint_groups.n())
-    for rxps in reciprocal_xpoints:
-        pass
-
-
+def crossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> List[Crossing]:
+    """
+        :param xpoint_groups: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point
+        :return: all possible distinct combinations of pairs (i.e. no word appears more than once over the two pairs) with at least one shared crossing point
     """
 
-    :param xpoint_groups: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point
-    :return: all possible distinct combinations of pairs (i.e. no word appears more than once over the two pairs) with at least one shared crossing point
-    """
+    res = []
+
+    reciprocal_xpoint_pairs = get_reciprocal_xpoints(list(xpoint_groups.keys()), xpoint_groups.m(), xpoint_groups.n())
+    print('recip. pairs:', reciprocal_xpoint_pairs)
+    for rxps in reciprocal_xpoint_pairs:
+        for pairs in pairwise_combinations(xpoint_groups[rxps[0]], xpoint_groups[rxps[1]]):
+            print('pairs:', pairs)
+            print('rxps:', rxps)
+            res.append(Crossing(pairs, rxps))
+    return res
+
+

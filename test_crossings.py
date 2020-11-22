@@ -87,34 +87,87 @@ def test_pairwise_combinations():
     actual = pairwise_combinations(['a', 'b', 'c'], ['a', 'b'])
     assert expected == set(actual)
 
-# def test_crossings_from_xpoint_groups():
-#     pairs = random_pairs(5, 7, 13)
-#
-#     xpoint_groups = XpointGroups({
-#         (0, 0): [pairs[0]],
-#         (0, 4): [pairs[1]],
-#         (1, 3): [pairs[2], pairs[3]],
-#         (2, 3): [pairs[4], pairs[5]],
-#         (3, 1): [pairs[6], pairs[7]],
-#         (3, 5): [pairs[8], pairs[9]],
-#         (4, 2): [pairs[10], pairs[11]],
-#         (4, 6): [pairs[12]]
-#
-#     })
-#
-#     expected = [
-#         Crossing([pairs[0], pairs[12]], [(0, 0), (4, 6)]),
-#         Crossing([pairs[1], pairs[10]], [(0, 4), (4, 2)]),
-#         Crossing([pairs[1], pairs[11]], [(0, 4), (4, 2)]),
-#         Crossing([pairs[4], pairs[5]], [(2, 3), (2, 3)]),
-#         Crossing([pairs[6], pairs[8]], [(3, 1), (3, 5)]),
-#         Crossing([pairs[6], pairs[9]], [(3, 1), (3, 5)]),
-#         Crossing([pairs[7], pairs[8]], [(3, 1), (3, 5)]),
-#         Crossing([pairs[7], pairs[9]], [(3, 1), (3, 5)]),
-#     ]
-#
-#     actual = crossings_from_xpoint_groups(xpoint_groups)
-#     assert set(actual) == set(expected)  # order doesn't matter
+
+class TestCrossingsFromXpointGroups:
+    @staticmethod
+    def assert_crossings(grps: XpointGroups, expected: List[CrossingPoint]):
+        actual = crossings_from_xpoint_groups(grps)
+        assert expected == set(actual)  # order doesn't matter
+
+    def test_no_crossings(self):
+        pairs = random_pairs(7, 5, 3)
+
+        xpoint_groups = XpointGroups({
+            (0, 0): [pairs[0]],  # recip. (6, 4) (DNE)
+            (1, 1): [pairs[1]],  # recip. (5, 3) (DNE)
+            (2, 2): [pairs[2]],  # recip. (4, 2) (DNE)
+        })
+
+        expected = set()
+
+        self.assert_crossings(xpoint_groups, expected)
+
+    def test_one_crossing(self):
+        pairs = random_pairs(7, 5, 2)
+
+        xpoint_groups = XpointGroups({
+            (0, 0): [pairs[0]],
+            (6, 4): [pairs[1]]
+
+        })
+
+        expected = {
+            Crossing((pairs[0], pairs[1]), ((0, 0), (6, 4))),
+        }
+
+        self.assert_crossings(xpoint_groups, expected)
+
+    def test_symmetrical_crossing_but_no_dupes(self):
+        pairs = random_pairs(7, 5, 2)
+
+        xpoint_groups = XpointGroups({
+            (3, 2): [pairs[0], pairs[1]],
+        })
+
+        expected = {
+            Crossing((pairs[0], pairs[1]), ((3, 2), (3, 2))),
+        }
+
+        self.assert_crossings(xpoint_groups, expected)
+
+    def test_combinatorics_two_by_one(self):
+        pairs = random_pairs(5, 4, 3)
+
+        xpoint_groups = XpointGroups({
+            (0, 1): [pairs[0]],
+            (4, 2): [pairs[1], pairs[2]]
+
+        })
+
+        expected = {
+            Crossing((pairs[0], pairs[1]), ((0, 1), (4, 2))),
+            Crossing((pairs[0], pairs[2]), ((0, 1), (4, 2))),
+        }
+
+        self.assert_crossings(xpoint_groups, expected)
+
+    def test_combinatorics_two_by_two(self):
+        pairs = random_pairs(5, 4, 4)
+
+        xpoint_groups = XpointGroups({
+            (0, 1): [pairs[0], pairs[1]],
+            (4, 2): [pairs[2], pairs[3]]
+
+        })
+
+        expected = {
+            Crossing((pairs[0], pairs[2]), ((0, 1), (4, 2))),
+            Crossing((pairs[1], pairs[2]), ((0, 1), (4, 2))),
+            Crossing((pairs[0], pairs[3]), ((0, 1), (4, 2))),
+            Crossing((pairs[1], pairs[3]), ((0, 1), (4, 2))),
+        }
+
+        self.assert_crossings(xpoint_groups, expected)
 
 
 def random_pairs(m: int, n: int, num_pairs: int) -> List[Pair]:
@@ -125,5 +178,5 @@ def random_pairs(m: int, n: int, num_pairs: int) -> List[Pair]:
     res = []
     letters = [l for l in string.ascii_lowercase]
     for i in range(num_pairs):
-        res.append(Pair(letters.pop() * m, letters.pop() * n))
+        res.append(Pair(letters.pop(0) * m, letters.pop(0) * n))
     return res
