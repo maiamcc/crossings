@@ -1,21 +1,16 @@
 from collections import defaultdict
 from typing import Dict, Generator, List, Set, Tuple
 
+
+class Pair(tuple):
+    def __new__(cls, wd1: str, wd2: str):
+        # Sort first by length (longer first), then if same length, alphabetically
+        return tuple(sorted([wd1, wd2], key=lambda x: (-len(x), x)))
+
+
 Wordlist = List[str]
-Pair = Tuple[str, str]
 Crossing = Set[Pair]
 CrossingPoint = Tuple[int, int]
-
-
-def new_pair(wd1: str, wd2: str) -> Pair:
-    if len(wd1) > len(wd2):
-        return wd1, wd2
-    elif len(wd1) < len(wd2):
-        return wd2, wd1
-    elif wd1 < wd2:  # wd1 comes alphabetically before wd2
-        return wd1, wd2
-    else:
-        return wd2, wd1
 
 
 def find_all_crossings(wds: Wordlist) -> Set[Crossing]:
