@@ -2,10 +2,14 @@ from collections import defaultdict
 from typing import Any, Generator, Iterable, List, Set, Tuple
 
 
+def sorted_tuple(*args, **kwargs):
+    return tuple(sorted(args, **kwargs))
+
+
 class Pair(tuple):
     def __new__(cls, wd1: str, wd2: str):
         # Sort first by length (longer first), then if same length, alphabetically
-        return tuple(sorted([wd1, wd2], key=lambda x: (-len(x), x)))
+        return sorted_tuple(wd1, wd2, key=lambda x: (-len(x), x))
 
 
 # Dict[CrossingPoint, List[Pair]
@@ -108,7 +112,7 @@ def pairwise_combinations(a: Iterable, b: Iterable) -> List[Tuple[Any]]:
     for elemA in a:
         for elemB in b:
             if elemA != elemB:
-                res.append(tuple(sorted([elemA, elemB])))
+                res.append(sorted_tuple(elemA, elemB))
     return res
 
 
@@ -153,7 +157,7 @@ def get_reciprocal_xpoints(xpoints: List[CrossingPoint], m: int, n: int) -> Set[
     for xp in xpoints:
         reciprocal = (m-1-xp[0], n-1-xp[1])
         if reciprocal in xpoints:
-            res.add(tuple(sorted((xp, reciprocal))))  # make sure it goes into the set in consistent order
+            res.add(sorted_tuple(xp, reciprocal))  # make sure it goes into the set in consistent order
     return res
 
 
