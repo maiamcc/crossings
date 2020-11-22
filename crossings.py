@@ -8,8 +8,34 @@ class Pair(tuple):
         return tuple(sorted([wd1, wd2], key=lambda x: (-len(x), x)))
 
 
+# Dict[CrossingPoint, List[Pair]
+class XpointGroups(dict):
+    # Just assume that all the pairs in here have the same word lengths. And are
+    # like, the right types and stuff. I'm not doing input verification because
+    # untyped languages are PERFECTLY SAFE what could go wrong 😬
+    def m(self):
+        for v in dict.values():
+            return len(v[0])
+
+    def n(self):
+        for v in dict.values():
+            return len(v[1])
+
+
+class Crossing:
+    def __init__(self, pairs: List[Pair], xpoints: List[Tuple[int, int]]):
+        if len(pairs) != 2:
+            raise TypeError('Need exactly two pairs (got {}: {})'.
+                            format(len(pairs), pairs))
+        if len(xpoints) != 2:
+            raise TypeError('Need exactly two xpoints (got {}: {})'.
+                            format(len(xpoints), xpoints))
+
+        self.pairs = pairs
+        self.xpoints = xpoints
+
+
 Wordlist = List[str]
-Crossing = Set[Pair]
 CrossingPoint = Tuple[int, int]
 
 
@@ -57,7 +83,7 @@ def find_crossings(len_m: Wordlist, len_n: Wordlist) -> Set[Crossing]:
     return crossings_from_xpoint_groups(pairs_by_xpoint)
 
 
-def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> Dict[CrossingPoint, List[Pair]]:
+def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> XpointGroups:
     """
     Find all possible pairs of one word of length m & one of length n.
 
@@ -76,7 +102,7 @@ def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[Pair]:
     pass
 
 
-def group_by_xpoint(pairs: List[Pair]) -> Dict[CrossingPoint, List[Pair]]:
+def group_by_xpoint(pairs: List[Pair]) -> XpointGroups:
     """
     Group all pairs by their valid crossing points. (Note that a single pair may have
     multiple valid crossing points.)
@@ -84,13 +110,13 @@ def group_by_xpoint(pairs: List[Pair]) -> Dict[CrossingPoint, List[Pair]]:
     :param pairs: pairs of words to group
     :return: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point
     """
-    res = defaultdict(list)
+    grps = defaultdict(list)
     for p in pairs:
         xpoints = xpoints_for_pair(p)
         for xpt in xpoints:
-            res[xpt].append(p)
+            grps[xpt].append(p)
 
-    return res
+    return XpointGroups(grps)
 
 
 def xpoints_for_pair(pair: Pair) -> List[CrossingPoint]:
@@ -111,7 +137,7 @@ def xpoints_for_pair(pair: Pair) -> List[CrossingPoint]:
     return res
 
 
-def crossings_from_xpoint_groups(xpoint_groups: Dict[CrossingPoint, List[Pair]]) -> Set[Crossing]:
+def crossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> Set[Crossing]:
     """
 
     :param xpoint_groups: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point

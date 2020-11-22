@@ -1,8 +1,9 @@
+import string
+from typing import List, Tuple
+
+from crossings import Crossing, crossings_from_xpoint_groups, group_by_xpoint, xpoints_for_pair, Pair, CrossingPoint, XpointGroups
+
 import pytest
-
-from crossings import crossings_from_xpoint_groups, group_by_xpoint, xpoints_for_pair, Pair, CrossingPoint
-
-from typing import List
 
 
 class TestPair:
@@ -49,20 +50,58 @@ class TestXpointsForPair:
 
 
 def test_group_by_xpoint():
-    p0 = Pair('abcde', 'fghij')     # no xpoints
-    p1 = Pair('abcxde', 'fgxhij')   # (3,2)
-    p2 = Pair('abcxdex', 'fgxhij')  # (3,2), (6,2)
-    p3 = Pair('abxdefg', 'hijklmx')  # (2,6)
+    p0 = Pair('abcdefgh', 'ijklmnop')  # no xpoints
+    p1 = Pair('abcxdefg', 'hixjklmn')  # (3,2)
+    p2 = Pair('abcxdexf', 'ghxijklm')  # (3,2), (6,2)
+    p3 = Pair('abxdefgh', 'ijklmnxo')  # (2,6)
 
-    expected = {
+    expected = XpointGroups({
         (3, 2): [p1, p2],
         (6, 2): [p2],
         (2, 6): [p3]
-    }
+    })
 
     # (a more robust test might check that each key contains the right values, ignoring order)
     assert group_by_xpoint([p0, p1, p2, p3]) == expected
 
 
 def test_crossings_from_xpoint_groups():
-    pass
+    pairs = random_pairs(5, 7, 13)
+
+    xpoint_groups = XpointGroups({
+        (0, 0): [pairs[0]],
+        (0, 4): [pairs[1]],
+        (1, 3): [pairs[2], pairs[3]],
+        (2, 3): [pairs[4], pairs[5]],
+        (3, 1): [pairs[6], pairs[7]],
+        (3, 5): [pairs[8], pairs[9]],
+        (4, 2): [pairs[10], pairs[11]],
+        (4, 6): [pairs[12]]
+
+    })
+
+    expected = [
+        Crossing([pairs[0], pairs[12]], [(0, 0), (4, 6)]),
+        Crossing([pairs[1], pairs[10]], [(0, 4), (4, 2)]),
+        Crossing([pairs[1], pairs[11]], [(0, 4), (4, 2)]),
+        Crossing([pairs[4], pairs[5]], [(2, 3), (2, 3)]),
+        Crossing([pairs[6], pairs[8]], [(3, 1), (3, 5)]),
+        Crossing([pairs[6], pairs[9]], [(3, 1), (3, 5)]),
+        Crossing([pairs[7], pairs[8]], [(3, 1), (3, 5)]),
+        Crossing([pairs[7], pairs[9]], [(3, 1), (3, 5)]),
+    ]
+
+    actual = crossings_from_xpoint_groups(xpoint_groups)
+    assert set(actual) == set(expected)  # order doesn't matter
+
+
+def random_pairs(m: int, n: int, num_pairs: int) -> List[Pair]:
+    """Test util to generate unique word-pairs."""
+    if num_pairs > 13:
+        raise Exception('why are you generating that many pairs?? There\'s only so much alphabet.')
+
+    res = []
+    letters = [l for l in string.ascii_lowercase]
+    for i in range(num_pairs):
+        res.append(Pair(letters.pop() * m, letters.pop() * n))
+    return res
