@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, Generator, List, Set, Tuple
+from typing import Any, Generator, Iterable, List, Set, Tuple
 
 
 class Pair(tuple):
@@ -14,11 +14,11 @@ class XpointGroups(dict):
     # like, the right types and stuff. I'm not doing input verification because
     # untyped languages are PERFECTLY SAFE what could go wrong 😬
     def m(self):
-        for v in dict.values():
+        for v in self.values():
             return len(v[0])
 
     def n(self):
-        for v in dict.values():
+        for v in self.values():
             return len(v[1])
 
 
@@ -99,7 +99,17 @@ def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[Pair]:
     """
     Find all possible pairs of one word of length m and one of length n.
     """
+    # pairwise_combinations and then make into Pair objects
     pass
+
+
+def pairwise_combinations(a: Iterable, b: Iterable) -> List[Tuple[Any]]:
+    res = []
+    for elemA in a:
+        for elemB in b:
+            if elemA != elemB:
+                res.append(tuple(sorted([elemA, elemB])))
+    return res
 
 
 def group_by_xpoint(pairs: List[Pair]) -> XpointGroups:
@@ -148,7 +158,9 @@ def get_reciprocal_xpoints(xpoints: List[CrossingPoint], m: int, n: int) -> Set[
 
 
 def crossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> Set[Crossing]:
-    reciprocal_crossings = get_reciprocal_xpoints(xpoint_groups.keys(), xpoint_groups.m(), xpoint_groups.n())
+    reciprocal_xpoints = get_reciprocal_xpoints(xpoint_groups.keys(), xpoint_groups.m(), xpoint_groups.n())
+    for rxps in reciprocal_xpoints:
+        pass
 
 
     """
