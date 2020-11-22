@@ -137,7 +137,20 @@ def xpoints_for_pair(pair: Pair) -> List[CrossingPoint]:
     return res
 
 
+def get_reciprocal_xpoints(xpoints: List[CrossingPoint], m: int, n: int) -> Set[Tuple[CrossingPoint]]:
+    res = set()
+    xpoints = set(xpoints)
+    for xp in xpoints:
+        reciprocal = (m-1-xp[0], n-1-xp[1])
+        if reciprocal in xpoints:
+            res.add(tuple(sorted((xp, reciprocal))))  # make sure it goes into the set in consistent order
+    return res
+
+
 def crossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> Set[Crossing]:
+    reciprocal_crossings = get_reciprocal_xpoints(xpoint_groups.keys(), xpoint_groups.m(), xpoint_groups.n())
+
+
     """
 
     :param xpoint_groups: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point

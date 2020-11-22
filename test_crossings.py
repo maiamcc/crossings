@@ -1,7 +1,7 @@
 import string
 from typing import List, Tuple
 
-from crossings import Crossing, crossings_from_xpoint_groups, group_by_xpoint, xpoints_for_pair, Pair, CrossingPoint, XpointGroups
+from crossings import Crossing, crossings_from_xpoint_groups, get_reciprocal_xpoints, group_by_xpoint, xpoints_for_pair, Pair, CrossingPoint, XpointGroups
 
 import pytest
 
@@ -65,34 +65,51 @@ def test_group_by_xpoint():
     assert group_by_xpoint([p0, p1, p2, p3]) == expected
 
 
-def test_crossings_from_xpoint_groups():
-    pairs = random_pairs(5, 7, 13)
+class TestGetReciprocalXpoints:
+    def test_no_reciprocal(self):
+        expected = set()
+        actual = get_reciprocal_xpoints([(0, 0), (0, 1), (0, 2)], 4, 7)
+        assert actual == expected
 
-    xpoint_groups = XpointGroups({
-        (0, 0): [pairs[0]],
-        (0, 4): [pairs[1]],
-        (1, 3): [pairs[2], pairs[3]],
-        (2, 3): [pairs[4], pairs[5]],
-        (3, 1): [pairs[6], pairs[7]],
-        (3, 5): [pairs[8], pairs[9]],
-        (4, 2): [pairs[10], pairs[11]],
-        (4, 6): [pairs[12]]
+    def test_reciprocal(self):
+        expected = {((0, 0), (7, 10)), ((3, 8), (4, 2))}
+        actual = get_reciprocal_xpoints([(0, 0), (7, 10), (3, 8), (4, 2), (5, 6)], 8, 11)
+        assert actual == expected
 
-    })
+    def test_reciprocal_symmetrical(self):
+        expected = {((0, 1), (6, 5)), ((3, 3), (3, 3))}
+        actual = get_reciprocal_xpoints([(0, 1), (6, 5), (3, 3), (4, 2), (5, 6)], 7, 7)
+        assert actual == expected
 
-    expected = [
-        Crossing([pairs[0], pairs[12]], [(0, 0), (4, 6)]),
-        Crossing([pairs[1], pairs[10]], [(0, 4), (4, 2)]),
-        Crossing([pairs[1], pairs[11]], [(0, 4), (4, 2)]),
-        Crossing([pairs[4], pairs[5]], [(2, 3), (2, 3)]),
-        Crossing([pairs[6], pairs[8]], [(3, 1), (3, 5)]),
-        Crossing([pairs[6], pairs[9]], [(3, 1), (3, 5)]),
-        Crossing([pairs[7], pairs[8]], [(3, 1), (3, 5)]),
-        Crossing([pairs[7], pairs[9]], [(3, 1), (3, 5)]),
-    ]
 
-    actual = crossings_from_xpoint_groups(xpoint_groups)
-    assert set(actual) == set(expected)  # order doesn't matter
+# def test_crossings_from_xpoint_groups():
+#     pairs = random_pairs(5, 7, 13)
+#
+#     xpoint_groups = XpointGroups({
+#         (0, 0): [pairs[0]],
+#         (0, 4): [pairs[1]],
+#         (1, 3): [pairs[2], pairs[3]],
+#         (2, 3): [pairs[4], pairs[5]],
+#         (3, 1): [pairs[6], pairs[7]],
+#         (3, 5): [pairs[8], pairs[9]],
+#         (4, 2): [pairs[10], pairs[11]],
+#         (4, 6): [pairs[12]]
+#
+#     })
+#
+#     expected = [
+#         Crossing([pairs[0], pairs[12]], [(0, 0), (4, 6)]),
+#         Crossing([pairs[1], pairs[10]], [(0, 4), (4, 2)]),
+#         Crossing([pairs[1], pairs[11]], [(0, 4), (4, 2)]),
+#         Crossing([pairs[4], pairs[5]], [(2, 3), (2, 3)]),
+#         Crossing([pairs[6], pairs[8]], [(3, 1), (3, 5)]),
+#         Crossing([pairs[6], pairs[9]], [(3, 1), (3, 5)]),
+#         Crossing([pairs[7], pairs[8]], [(3, 1), (3, 5)]),
+#         Crossing([pairs[7], pairs[9]], [(3, 1), (3, 5)]),
+#     ]
+#
+#     actual = crossings_from_xpoint_groups(xpoint_groups)
+#     assert set(actual) == set(expected)  # order doesn't matter
 
 
 def random_pairs(m: int, n: int, num_pairs: int) -> List[Pair]:
