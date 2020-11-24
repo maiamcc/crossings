@@ -1,7 +1,7 @@
 import string
 from typing import List, Tuple
 
-from crossings import Crossing, crossings_from_xpoint_groups, get_reciprocal_xpoints, group_by_xpoint, pairwise_combinations, xpoints_for_pair, Pair, CrossingPoint, XpointGroups
+from crossings import Crossing, crossings_from_xpoint_groups, find_pairs, get_reciprocal_xpoints, group_by_xpoint, pairwise_combinations, xpoints_for_pair, Pair, CrossingPoint, XpointGroups
 
 import pytest
 
@@ -85,6 +85,12 @@ class TestGetReciprocalXpoints:
 def test_pairwise_combinations():
     expected = {('a', 'b'), ('a', 'c'), ('a', 'c'), ('b', 'c')}
     actual = pairwise_combinations(['a', 'b', 'c'], ['a', 'b'])
+    assert expected == set(actual)
+
+
+def test_find_pairs():
+    expected = {Pair('a', 'b'), Pair('a', 'c'), Pair('a', 'c'), Pair('b', 'c')}
+    actual = find_pairs(['a', 'b', 'c'], ['a', 'b'])
     assert expected == set(actual)
 
 

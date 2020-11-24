@@ -113,8 +113,12 @@ def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[Pair]:
     """
     Find all possible pairs of one word of length m and one of length n.
     """
-    # pairwise_combinations and then make into Pair objects
-    pass
+    res = []
+    combs = pairwise_combinations(len_m, len_n)
+    for wd1, wd2 in combs:
+        res.append(Pair(wd1, wd2))
+
+    return res
 
 
 def pairwise_combinations(a: Iterable, b: Iterable) -> List[Tuple[Any]]:
