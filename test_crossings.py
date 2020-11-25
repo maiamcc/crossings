@@ -1,27 +1,13 @@
 import string
 from typing import List, Set
 
-from crossings import Crossing, crossings_from_xpoint_groups, find_pairs, get_reciprocal_xpoints, group_by_xpoint, pairwise_combinations, xpoints_for_word_pair, WordPair, CrossingPoint, XpointGroups
+from crossings import multicrossings_from_xpoint_groups, find_pairs, get_reciprocal_xpoints, group_by_xpoint, pairwise_combinations, xpoints_for_word_pair
+from types_ import Multicrossing, WordPair, CrossingPoint, XpointGroups
 
 import pytest
 
 
-class TestWordPair:
-    def test_first_longer(self):
-        p = WordPair('bbbbb', 'aaa')
-        assert p == ('bbbbb', 'aaa')
 
-    def test_first_shorter(self):
-        p = WordPair('aaa', 'bbbbb')
-        assert p == ('bbbbb', 'aaa')
-
-    def test_equal_length_first_earlier(self):
-        p = WordPair('aaa', 'bbb')
-        assert p == ('aaa', 'bbb')
-
-    def test_equal_length_first_later(self):
-        p = WordPair('bbb', 'aaa')
-        assert p == ('aaa', 'bbb')
 
 
 class TestXpointsForPair:
@@ -96,8 +82,8 @@ def test_find_pairs():
 
 class TestCrossingsFromXpointGroups:
     @staticmethod
-    def assert_crossings(grps: XpointGroups, expected: Set[Crossing]):
-        actual = crossings_from_xpoint_groups(grps)
+    def assert_crossings(grps: XpointGroups, expected: Set[Multicrossing]):
+        actual = multicrossings_from_xpoint_groups(grps)
         assert expected == set(actual)  # order doesn't matter
 
     def test_no_crossings(self):
@@ -123,7 +109,7 @@ class TestCrossingsFromXpointGroups:
         })
 
         expected = {
-            Crossing((pairs[0], pairs[1]), ((0, 0), (6, 4))),
+            Multicrossing((pairs[0], pairs[1]), ((0, 0), (6, 4))),
         }
 
         self.assert_crossings(xpoint_groups, expected)
@@ -136,7 +122,7 @@ class TestCrossingsFromXpointGroups:
         })
 
         expected = {
-            Crossing((pairs[0], pairs[1]), ((3, 2), (3, 2))),
+            Multicrossing((pairs[0], pairs[1]), ((3, 2), (3, 2))),
         }
 
         self.assert_crossings(xpoint_groups, expected)
@@ -151,8 +137,8 @@ class TestCrossingsFromXpointGroups:
         })
 
         expected = {
-            Crossing((pairs[0], pairs[1]), ((0, 1), (4, 2))),
-            Crossing((pairs[0], pairs[2]), ((0, 1), (4, 2))),
+            Multicrossing((pairs[0], pairs[1]), ((0, 1), (4, 2))),
+            Multicrossing((pairs[0], pairs[2]), ((0, 1), (4, 2))),
         }
 
         self.assert_crossings(xpoint_groups, expected)
@@ -167,10 +153,10 @@ class TestCrossingsFromXpointGroups:
         })
 
         expected = {
-            Crossing((pairs[0], pairs[2]), ((0, 1), (4, 2))),
-            Crossing((pairs[1], pairs[2]), ((0, 1), (4, 2))),
-            Crossing((pairs[0], pairs[3]), ((0, 1), (4, 2))),
-            Crossing((pairs[1], pairs[3]), ((0, 1), (4, 2))),
+            Multicrossing((pairs[0], pairs[2]), ((0, 1), (4, 2))),
+            Multicrossing((pairs[1], pairs[2]), ((0, 1), (4, 2))),
+            Multicrossing((pairs[0], pairs[3]), ((0, 1), (4, 2))),
+            Multicrossing((pairs[1], pairs[3]), ((0, 1), (4, 2))),
         }
 
         self.assert_crossings(xpoint_groups, expected)

@@ -1,62 +1,17 @@
 from collections import defaultdict
 from typing import Any, Generator, Iterable, List, Set, Tuple
 
+from types_ import CrossingPoint, Multicrossing, Wordlist, WordPair, XpointGroups
+
 
 def sorted_tuple(*args, **kwargs):
     return tuple(sorted(args, **kwargs))
 
 
-class WordPair(tuple):
-    def __new__(cls, wd1: str, wd2: str):
-        # Sort first by length (longer first), then if same length, alphabetically
-        return sorted_tuple(wd1, wd2, key=lambda x: (-len(x), x))
-
-
-# Dict[CrossingPoint, List[WordPair]
-class XpointGroups(dict):
-    # Just assume that all the wdpairs in here have the same word lengths. And are
-    # like, the right types and stuff. I'm not doing input verification because
-    # untyped languages are PERFECTLY SAFE what could go wrong 😬
-    def m(self):
-        for v in self.values():
-            return len(v[0][0])
-
-    def n(self):
-        for v in self.values():
-            return len(v[0][1])
-
-
-class Crossing:
-    def __init__(self, wd_pairs: Tuple[WordPair, WordPair], xpoints: Tuple[Tuple[int, int], Tuple[int, int]]):
-        if len(wd_pairs) != 2:
-            raise TypeError('Need exactly two wd_pairs (got {}: {})'.
-                            format(len(wd_pairs), wd_pairs))
-        if len(xpoints) != 2:
-            raise TypeError('Need exactly two xpoints (got {}: {})'.
-                            format(len(xpoints), xpoints))
-
-        self.wd_pairs = wd_pairs
-        self.xpoints = xpoints
-
-    def __hash__(self): return self.wd_pairs.__hash__() + self.xpoints.__hash__()
-
-    def __eq__(self, other): return self.__hash__() == other.__hash__()
-
-    def __repr__(self):
-        return '{} @ {} & {} @ {}'.format(self.wd_pairs[0], self.xpoints[0],
-                                          self.wd_pairs[1], self.xpoints[1])
-
-
-
-
-Wordlist = List[str]
-CrossingPoint = Tuple[int, int]
-
-
-def find_all_crossings(wds: Wordlist) -> Set[Crossing]:
+def find_all_multicrossings(wds: Wordlist) -> Set[Multicrossing]:
     result = set()
     for len_m, len_n in wds_of_len_m_and_n(wds):
-        result.update(find_crossings(len_m, len_n))
+        result.update(find_multicrossings(len_m, len_n))
     return result
 
 
@@ -77,11 +32,11 @@ def wds_of_len_m_and_n(wds: Wordlist) -> Generator[Tuple[Wordlist, Wordlist], No
     pass
 
 
-def find_crossings(len_m: Wordlist, len_n: Wordlist) -> Set[Crossing]:
+def find_multicrossings(len_m: Wordlist, len_n: Wordlist) -> List[Multicrossing]:
     """
-    Find crossings between words of length m and length n.
+    Find multicrossings between words of length m and length n.
 
-    A crossing is a set of pairs of words (each pair of words containing one word
+    A multicrossing is a set of pairs of words (each pair of words containing one word
     of length m and one of length n) such that the two pairs may intersect symmetrically.
     E.g. if the first pair intersects at (2, 4), the second pair intersects at (n-3, n-5)
     or, in English: in pair #1, if the 3rd character of the first word is the same as the
@@ -94,7 +49,7 @@ def find_crossings(len_m: Wordlist, len_n: Wordlist) -> Set[Crossing]:
     :return: all possible crossings where two words of length m can intersect two words of length n symmetrically
     """
     pairs_by_xpoint = find_pairs_and_group_by_xpoint(len_m, len_n)
-    return crossings_from_xpoint_groups(pairs_by_xpoint)
+    return multicrossings_from_xpoint_groups(pairs_by_xpoint)
 
 
 def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> XpointGroups:
@@ -175,7 +130,7 @@ def get_reciprocal_xpoints(xpoints: List[CrossingPoint], m: int, n: int) -> Set[
     return res
 
 
-def crossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> List[Crossing]:
+def multicrossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> List[Multicrossing]:
     """
         :param xpoint_groups: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point
         :return: all possible distinct combinations of pairs (i.e. no word appears more than once over the two pairs) with at least one shared crossing point
@@ -186,7 +141,7 @@ def crossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> List[Crossing]:
     reciprocal_xpoint_pairs = get_reciprocal_xpoints(list(xpoint_groups.keys()), xpoint_groups.m(), xpoint_groups.n())
     for rxps in reciprocal_xpoint_pairs:
         for wd_pairs in pairwise_combinations(xpoint_groups[rxps[0]], xpoint_groups[rxps[1]]):
-            res.append(Crossing(wd_pairs, rxps))
+            res.append(Multicrossing(wd_pairs, rxps))
     return res
 
 
