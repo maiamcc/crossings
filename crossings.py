@@ -2,10 +2,7 @@ from collections import defaultdict
 from typing import Any, Generator, Iterable, List, Set, Tuple
 
 from types_ import CrossingPoint, Multicrossing, Wordlist, WordPair, XpointGroups
-
-
-def sorted_tuple(*args, **kwargs):
-    return tuple(sorted(args, **kwargs))
+from utils import pairwise_combinations, sorted_tuple
 
 
 def find_all_multicrossings(wds: Wordlist) -> Set[Multicrossing]:
@@ -73,15 +70,6 @@ def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[WordPair]:
     for wd1, wd2 in combs:
         res.append(WordPair(wd1, wd2))
 
-    return res
-
-
-def pairwise_combinations(a: Iterable, b: Iterable) -> List[Tuple[Any]]:
-    res = []
-    for elemA in a:
-        for elemB in b:
-            if elemA != elemB:
-                res.append(sorted_tuple(elemA, elemB))
     return res
 
 

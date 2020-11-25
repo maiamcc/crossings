@@ -1,6 +1,7 @@
 import pytest
 
-from types import WordPair
+from types_ import WordPair
+
 
 class TestWordPair:
     def test_first_longer(self):

@@ -1,8 +1,6 @@
 from typing import Any, Generator, Iterable, List, Set, Tuple
 
-
-def sorted_tuple(*args, **kwargs):
-    return tuple(sorted(args, **kwargs))
+from utils import sorted_tuple
 
 
 class WordPair(tuple):

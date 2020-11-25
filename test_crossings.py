@@ -1,13 +1,10 @@
 import string
 from typing import List, Set
 
-from crossings import multicrossings_from_xpoint_groups, find_pairs, get_reciprocal_xpoints, group_by_xpoint, pairwise_combinations, xpoints_for_word_pair
+from crossings import multicrossings_from_xpoint_groups, find_pairs, get_reciprocal_xpoints, group_by_xpoint, xpoints_for_word_pair
 from types_ import Multicrossing, WordPair, CrossingPoint, XpointGroups
 
 import pytest
-
-
-
 
 
 class TestXpointsForPair:
@@ -66,12 +63,6 @@ class TestGetReciprocalXpoints:
         expected = {((0, 1), (6, 5)), ((3, 3), (3, 3))}
         actual = get_reciprocal_xpoints([(0, 1), (6, 5), (3, 3), (4, 2), (5, 6)], 7, 7)
         assert actual == expected
-
-
-def test_pairwise_combinations():
-    expected = {('a', 'b'), ('a', 'c'), ('a', 'c'), ('b', 'c')}
-    actual = pairwise_combinations(['a', 'b', 'c'], ['a', 'b'])
-    assert expected == set(actual)
 
 
 def test_find_pairs():
