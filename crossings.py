@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Generator, Iterable, List, Set, Tuple
+from typing import Generator, List, Set, Tuple
 
 from types_ import CrossingPoint, Multicrossing, Wordlist, WordPair, XpointGroups
 from utils import pairwise_combinations, sorted_tuple
