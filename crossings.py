@@ -6,15 +6,15 @@ def sorted_tuple(*args, **kwargs):
     return tuple(sorted(args, **kwargs))
 
 
-class Pair(tuple):
+class WordPair(tuple):
     def __new__(cls, wd1: str, wd2: str):
         # Sort first by length (longer first), then if same length, alphabetically
         return sorted_tuple(wd1, wd2, key=lambda x: (-len(x), x))
 
 
-# Dict[CrossingPoint, List[Pair]
+# Dict[CrossingPoint, List[WordPair]
 class XpointGroups(dict):
-    # Just assume that all the pairs in here have the same word lengths. And are
+    # Just assume that all the wdpairs in here have the same word lengths. And are
     # like, the right types and stuff. I'm not doing input verification because
     # untyped languages are PERFECTLY SAFE what could go wrong 😬
     def m(self):
@@ -27,24 +27,24 @@ class XpointGroups(dict):
 
 
 class Crossing:
-    def __init__(self, pairs: Tuple[Pair, Pair], xpoints: Tuple[Tuple[int, int], Tuple[int, int]]):
-        if len(pairs) != 2:
-            raise TypeError('Need exactly two pairs (got {}: {})'.
-                            format(len(pairs), pairs))
+    def __init__(self, wd_pairs: Tuple[WordPair, WordPair], xpoints: Tuple[Tuple[int, int], Tuple[int, int]]):
+        if len(wd_pairs) != 2:
+            raise TypeError('Need exactly two wd_pairs (got {}: {})'.
+                            format(len(wd_pairs), wd_pairs))
         if len(xpoints) != 2:
             raise TypeError('Need exactly two xpoints (got {}: {})'.
                             format(len(xpoints), xpoints))
 
-        self.pairs = pairs
+        self.wd_pairs = wd_pairs
         self.xpoints = xpoints
 
-    def __hash__(self): return self.pairs.__hash__() + self.xpoints.__hash__()
+    def __hash__(self): return self.wd_pairs.__hash__() + self.xpoints.__hash__()
 
     def __eq__(self, other): return self.__hash__() == other.__hash__()
 
     def __repr__(self):
-        return '{} @ {} & {} @ {}'.format(self.pairs[0], self.xpoints[0],
-                                          self.pairs[1], self.xpoints[1])
+        return '{} @ {} & {} @ {}'.format(self.wd_pairs[0], self.xpoints[0],
+                                          self.wd_pairs[1], self.xpoints[1])
 
 
 
@@ -109,14 +109,14 @@ def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> XpointGr
     return group_by_xpoint(pairs)
 
 
-def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[Pair]:
+def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[WordPair]:
     """
     Find all possible pairs of one word of length m and one of length n.
     """
     res = []
     combs = pairwise_combinations(len_m, len_n)
     for wd1, wd2 in combs:
-        res.append(Pair(wd1, wd2))
+        res.append(WordPair(wd1, wd2))
 
     return res
 
@@ -130,24 +130,24 @@ def pairwise_combinations(a: Iterable, b: Iterable) -> List[Tuple[Any]]:
     return res
 
 
-def group_by_xpoint(pairs: List[Pair]) -> XpointGroups:
+def group_by_xpoint(wd_pairs: List[WordPair]) -> XpointGroups:
     """
     Group all pairs by their valid crossing points. (Note that a single pair may have
     multiple valid crossing points.)
 
-    :param pairs: pairs of words to group
+    :param wd_pairs: pairs of words to group
     :return: a dict of crossing points (int tuples indicating indices) -> all the pairs for which this is a valid crossing point
     """
     grps = defaultdict(list)
-    for p in pairs:
-        xpoints = xpoints_for_pair(p)
+    for p in wd_pairs:
+        xpoints = xpoints_for_word_pair(p)
         for xpt in xpoints:
             grps[xpt].append(p)
 
     return XpointGroups(grps)
 
 
-def xpoints_for_pair(pair: Pair) -> List[CrossingPoint]:
+def xpoints_for_word_pair(wd_pair: WordPair) -> List[CrossingPoint]:
     """
     Find all possible crossing points for the given pair of words.
 
@@ -158,8 +158,8 @@ def xpoints_for_pair(pair: Pair) -> List[CrossingPoint]:
     res = []
 
     # this is inefficient but words are short so I don't care
-    for i, ch1 in enumerate(pair[0]):
-        for j, ch2 in enumerate(pair[1]):
+    for i, ch1 in enumerate(wd_pair[0]):
+        for j, ch2 in enumerate(wd_pair[1]):
             if ch1 == ch2:
                 res.append((i, j))
     return res
@@ -184,12 +184,10 @@ def crossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> List[Crossing]:
     res = []
 
     reciprocal_xpoint_pairs = get_reciprocal_xpoints(list(xpoint_groups.keys()), xpoint_groups.m(), xpoint_groups.n())
-    print('recip. pairs:', reciprocal_xpoint_pairs)
     for rxps in reciprocal_xpoint_pairs:
-        for pairs in pairwise_combinations(xpoint_groups[rxps[0]], xpoint_groups[rxps[1]]):
-            print('pairs:', pairs)
-            print('rxps:', rxps)
-            res.append(Crossing(pairs, rxps))
+        for wd_pairs in pairwise_combinations(xpoint_groups[rxps[0]], xpoint_groups[rxps[1]]):
+            res.append(Crossing(wd_pairs, rxps))
     return res
+
 
 

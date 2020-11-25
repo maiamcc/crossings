@@ -1,59 +1,59 @@
 import string
-from typing import List, Tuple
+from typing import List, Set
 
-from crossings import Crossing, crossings_from_xpoint_groups, find_pairs, get_reciprocal_xpoints, group_by_xpoint, pairwise_combinations, xpoints_for_pair, Pair, CrossingPoint, XpointGroups
+from crossings import Crossing, crossings_from_xpoint_groups, find_pairs, get_reciprocal_xpoints, group_by_xpoint, pairwise_combinations, xpoints_for_word_pair, WordPair, CrossingPoint, XpointGroups
 
 import pytest
 
 
-class TestPair:
+class TestWordPair:
     def test_first_longer(self):
-        p = Pair('bbbbb', 'aaa')
+        p = WordPair('bbbbb', 'aaa')
         assert p == ('bbbbb', 'aaa')
 
     def test_first_shorter(self):
-        p = Pair('aaa', 'bbbbb')
+        p = WordPair('aaa', 'bbbbb')
         assert p == ('bbbbb', 'aaa')
 
     def test_equal_length_first_earlier(self):
-        p = Pair('aaa', 'bbb')
+        p = WordPair('aaa', 'bbb')
         assert p == ('aaa', 'bbb')
 
     def test_equal_length_first_later(self):
-        p = Pair('bbb', 'aaa')
+        p = WordPair('bbb', 'aaa')
         assert p == ('aaa', 'bbb')
 
 
 class TestXpointsForPair:
     @staticmethod
-    def assert_xpoints(pair: Pair, expected: List[CrossingPoint]):
-        actual = xpoints_for_pair(pair)
+    def assert_xpoints(pair: WordPair, expected: List[CrossingPoint]):
+        actual = xpoints_for_word_pair(pair)
         assert set(expected) == set(actual)  # order doesn't matter
 
     def test_no_common_letters(self):
-        self.assert_xpoints(Pair('abcde', 'fghij'), [])
+        self.assert_xpoints(WordPair('abcde', 'fghij'), [])
 
     def test_one_possible_crossing(self):
-        self.assert_xpoints(Pair('abcxde', 'fgxhij'), [(3, 2)])
+        self.assert_xpoints(WordPair('abcxde', 'fgxhij'), [(3, 2)])
 
     def test_common_letter_twice_one_word(self):
-        self.assert_xpoints(Pair('abcxdex', 'fgxhij'), [(3, 2), (6, 2)])
+        self.assert_xpoints(WordPair('abcxdex', 'fgxhij'), [(3, 2), (6, 2)])
 
     def test_common_letter_twice_each_word(self):
-        self.assert_xpoints(Pair('abcxdex', 'xfgxhij'), [(3, 0), (6, 0), (3, 3), (6, 3)])
+        self.assert_xpoints(WordPair('abcxdex', 'xfgxhij'), [(3, 0), (6, 0), (3, 3), (6, 3)])
 
     def test_many_crossing_points(self):
-        self.assert_xpoints(Pair('stackoverflow', 'storkovenmitt'),
+        self.assert_xpoints(WordPair('stackoverflow', 'storkovenmitt'),
                             [(0, 0), (1, 1), (1, 11), (1, 12), (4, 4), (5, 2),
                              (5, 5), (6, 6), (7, 7), (8, 3), (11, 2), (11, 5)]
                             )
 
 
 def test_group_by_xpoint():
-    p0 = Pair('abcdefgh', 'ijklmnop')  # no xpoints
-    p1 = Pair('abcxdefg', 'hixjklmn')  # (3,2)
-    p2 = Pair('abcxdexf', 'ghxijklm')  # (3,2), (6,2)
-    p3 = Pair('abxdefgh', 'ijklmnxo')  # (2,6)
+    p0 = WordPair('abcdefgh', 'ijklmnop')  # no xpoints
+    p1 = WordPair('abcxdefg', 'hixjklmn')  # (3,2)
+    p2 = WordPair('abcxdexf', 'ghxijklm')  # (3,2), (6,2)
+    p3 = WordPair('abxdefgh', 'ijklmnxo')  # (2,6)
 
     expected = XpointGroups({
         (3, 2): [p1, p2],
@@ -89,14 +89,14 @@ def test_pairwise_combinations():
 
 
 def test_find_pairs():
-    expected = {Pair('a', 'b'), Pair('a', 'c'), Pair('a', 'c'), Pair('b', 'c')}
+    expected = {WordPair('a', 'b'), WordPair('a', 'c'), WordPair('a', 'c'), WordPair('b', 'c')}
     actual = find_pairs(['a', 'b', 'c'], ['a', 'b'])
     assert expected == set(actual)
 
 
 class TestCrossingsFromXpointGroups:
     @staticmethod
-    def assert_crossings(grps: XpointGroups, expected: List[CrossingPoint]):
+    def assert_crossings(grps: XpointGroups, expected: Set[Crossing]):
         actual = crossings_from_xpoint_groups(grps)
         assert expected == set(actual)  # order doesn't matter
 
@@ -176,7 +176,7 @@ class TestCrossingsFromXpointGroups:
         self.assert_crossings(xpoint_groups, expected)
 
 
-def random_pairs(m: int, n: int, num_pairs: int) -> List[Pair]:
+def random_pairs(m: int, n: int, num_pairs: int) -> List[WordPair]:
     """Test util to generate unique word-pairs."""
     if num_pairs > 13:
         raise Exception('why are you generating that many pairs?? There\'s only so much alphabet.')
@@ -184,5 +184,5 @@ def random_pairs(m: int, n: int, num_pairs: int) -> List[Pair]:
     res = []
     letters = [l for l in string.ascii_lowercase]
     for i in range(num_pairs):
-        res.append(Pair(letters.pop(0) * m, letters.pop(0) * n))
+        res.append(WordPair(letters.pop(0) * m, letters.pop(0) * n))
     return res
