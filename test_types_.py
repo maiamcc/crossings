@@ -23,7 +23,18 @@ class TestWordPair:
 
 class TestWordList:
     def test_group_by_len(self):
-        pass
+        given = ['a', 'b', 'ccc', 'dd', 'ee', 'fff', 'ggggg', 'h']
+        expected = [
+            WordList(['a', 'b', 'h']),
+            WordList(['dd', 'ee']),
+            WordList(['ccc', 'fff']),
+            WordList(['ggggg']),
+        ]
+
+        wd_list = WordList(given)
+        actual = wd_list.group_by_len()
+
+        assert expected == actual
 
     def wds_of_len_m_and_n(self):
         pass

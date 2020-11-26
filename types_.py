@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Generator, List, Tuple
 
 from utils import sorted_tuple
@@ -51,7 +52,11 @@ class WordList(list):
     def group_by_len(self) -> List['WordList']:
         """Given a list of words, return a list of lists of words,
         where each list contains all the words of a given length."""
-        pass
+        d = defaultdict(list)
+        for wd in self:
+            d[len(wd)].append(wd)
+
+        return [WordList(d[n]) for n in sorted(d.keys())]
 
     def wds_of_len_m_and_n(self) -> Generator[Tuple['WordList', 'WordList'], None, None]:
         """
