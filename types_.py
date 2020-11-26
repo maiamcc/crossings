@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Generator, List, Tuple
 
 from utils import sorted_tuple
 
@@ -45,5 +45,23 @@ class Multicrossing:
                                           self.wd_pairs[1], self.xpoints[1])
 
 
-Wordlist = List[str]
+class WordList(list):
+    """A list of words (i.e. List[str])."""
+
+    def group_by_len(self) -> List['WordList']:
+        """Given a list of words, return a list of lists of words,
+        where each list contains all the words of a given length."""
+        pass
+
+    def wds_of_len_m_and_n(self) -> Generator[Tuple['WordList', 'WordList'], None, None]:
+        """
+            Given a list of words, group by length and yield all possible pairwise
+            combinations of groups.
+        """
+        wds_by_len = self.group_by_len()
+
+        # all possible pairwise combinations
+        pass
+
+
 CrossingPoint = Tuple[int, int]

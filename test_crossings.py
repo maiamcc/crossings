@@ -51,17 +51,17 @@ def test_group_by_xpoint():
 class TestGetReciprocalXpoints:
     def test_no_reciprocal(self):
         expected = set()
-        actual = get_reciprocal_xpoints([(0, 0), (0, 1), (0, 2)], 4, 7)
+        actual = get_reciprocal_xpoints({(0, 0), (0, 1), (0, 2)}, 4, 7)
         assert actual == expected
 
     def test_reciprocal(self):
         expected = {((0, 0), (7, 10)), ((3, 8), (4, 2))}
-        actual = get_reciprocal_xpoints([(0, 0), (7, 10), (3, 8), (4, 2), (5, 6)], 8, 11)
+        actual = get_reciprocal_xpoints({(0, 0), (7, 10), (3, 8), (4, 2), (5, 6)}, 8, 11)
         assert actual == expected
 
     def test_reciprocal_symmetrical(self):
         expected = {((0, 1), (6, 5)), ((3, 3), (3, 3))}
-        actual = get_reciprocal_xpoints([(0, 1), (6, 5), (3, 3), (4, 2), (5, 6)], 7, 7)
+        actual = get_reciprocal_xpoints({(0, 1), (6, 5), (3, 3), (4, 2), (5, 6)}, 7, 7)
         assert actual == expected
 
 

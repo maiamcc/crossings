@@ -1,35 +1,19 @@
 from collections import defaultdict
 from typing import Generator, List, Set, Tuple
 
-from types_ import CrossingPoint, Multicrossing, Wordlist, WordPair, XpointGroups
+from types_ import CrossingPoint, Multicrossing, WordList, WordPair, XpointGroups
 from utils import pairwise_combinations, sorted_tuple
 
 
-def find_all_multicrossings(wds: Wordlist) -> Set[Multicrossing]:
+def find_all_multicrossings(wds: List[str]) -> Set[Multicrossing]:
+    wordlist = WordList(wds)
     result = set()
-    for len_m, len_n in wds_of_len_m_and_n(wds):
+    for len_m, len_n in wordlist.wds_of_len_m_and_n(wds):
         result.update(find_multicrossings(len_m, len_n))
     return result
 
 
-def group_by_len(wds: Wordlist) -> List[Wordlist]:
-    """Given a list of words, return a list of lists of words,
-       where each list contains all the words of a given length."""
-    pass
-
-
-def wds_of_len_m_and_n(wds: Wordlist) -> Generator[Tuple[Wordlist, Wordlist], None, None]:
-    """
-        Given a list of words, group by length and yield all possible pairwise
-        combinations of groups.
-    """
-    wds_by_len = group_by_len(wds)
-
-    # all possible pairwise combinations
-    pass
-
-
-def find_multicrossings(len_m: Wordlist, len_n: Wordlist) -> List[Multicrossing]:
+def find_multicrossings(len_m: WordList, len_n: WordList) -> List[Multicrossing]:
     """
     Find multicrossings between words of length m and length n.
 
@@ -49,7 +33,7 @@ def find_multicrossings(len_m: Wordlist, len_n: Wordlist) -> List[Multicrossing]
     return multicrossings_from_xpoint_groups(pairs_by_xpoint)
 
 
-def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> XpointGroups:
+def find_pairs_and_group_by_xpoint(len_m: WordList, len_n: WordList) -> XpointGroups:
     """
     Find all possible pairs of one word of length m & one of length n.
 
@@ -61,7 +45,7 @@ def find_pairs_and_group_by_xpoint(len_m: Wordlist, len_n: Wordlist) -> XpointGr
     return group_by_xpoint(pairs)
 
 
-def find_pairs(len_m: Wordlist, len_n: Wordlist) -> List[WordPair]:
+def find_pairs(len_m: WordList, len_n: WordList) -> List[WordPair]:
     """
     Find all possible pairs of one word of length m and one of length n.
     """
@@ -108,7 +92,7 @@ def xpoints_for_word_pair(wd_pair: WordPair) -> List[CrossingPoint]:
     return res
 
 
-def get_reciprocal_xpoints(xpoints: List[CrossingPoint], m: int, n: int) -> Set[Tuple[CrossingPoint]]:
+def get_reciprocal_xpoints(xpoints: Set[CrossingPoint], m: int, n: int) -> Set[Tuple[CrossingPoint]]:
     res = set()
     xpoints = set(xpoints)
     for xp in xpoints:
@@ -126,7 +110,7 @@ def multicrossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> List[Multi
 
     res = []
 
-    reciprocal_xpoint_pairs = get_reciprocal_xpoints(list(xpoint_groups.keys()), xpoint_groups.m(), xpoint_groups.n())
+    reciprocal_xpoint_pairs = get_reciprocal_xpoints(set(xpoint_groups.keys()), xpoint_groups.m(), xpoint_groups.n())
     for rxps in reciprocal_xpoint_pairs:
         for wd_pairs in pairwise_combinations(xpoint_groups[rxps[0]], xpoint_groups[rxps[1]]):
             res.append(Multicrossing(wd_pairs, rxps))
