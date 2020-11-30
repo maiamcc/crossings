@@ -1,12 +1,13 @@
 from collections import defaultdict
-from typing import Generator, List, Set, Tuple
+from typing import List, Set, Tuple
 
 from types_ import CrossingPoint, Multicrossing, WordList, WordPair, XpointGroups
-from utils import pairwise_combinations, sorted_tuple
+from utils import pairwise_combinations, normalize, sorted_tuple
 
 
 def find_all_multicrossings(wds: List[str]) -> Set[Multicrossing]:
-    wordlist = WordList(wds)
+    # TODO: normalize words in WordList constructor
+    wordlist = WordList([normalize(wd) for wd in wds])
     result = set()
     for len_m, len_n in wordlist.wds_of_len_m_and_n():
         result.update(find_multicrossings(len_m, len_n))
@@ -112,7 +113,7 @@ def multicrossings_from_xpoint_groups(xpoint_groups: XpointGroups) -> List[Multi
 
     reciprocal_xpoint_pairs = get_reciprocal_xpoints(set(xpoint_groups.keys()), xpoint_groups.m(), xpoint_groups.n())
     for rxps in reciprocal_xpoint_pairs:
-        for wd_pairs in pairwise_combinations(xpoint_groups[rxps[0]], xpoint_groups[rxps[1]]):
+        for wd_pairs in pairwise_combinations(xpoint_groups[rxps[0]], xpoint_groups[rxps[1]], sort=False):
             res.append(Multicrossing(wd_pairs, rxps))
     return res
 

@@ -163,7 +163,7 @@ class TestCrossingsFromXpointGroups:
         }
 
         self.assert_crossings(xpoint_groups, expected)
-
+#
 
 class TestFindAllMulticrossings:
     def test_simple(self):
@@ -186,13 +186,13 @@ class TestFindAllMulticrossings:
         assert expected == actual
 
     def test_normalized(self):
-        given = ['some CLUE', 'clue-again', 'other clue!', '"next clue"']
+        given = ['aaaB AA', 'ZZZB-zzzz', 'CC D! ccc', '"yy? yyd! yyy?"']
         expected = {
             Multicrossing(
-                (WordPair('CLUEAGAIN', 'SOMECLUE'), WordPair('OTHERCLUE', 'NEXTCLUE')),
-                ((3, 3), (5, 4))
+                (WordPair('ZZZBZZZZ', 'AAABAA'), WordPair('YYYYDYYY', 'CCDCCC')),
+                ((3, 3), (4, 2))
             )
         }
         actual = find_all_multicrossings(given)
-
+        print(actual)
         assert expected == actual
