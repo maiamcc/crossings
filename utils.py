@@ -16,3 +16,7 @@ def pairwise_combinations(a: Iterable, b: Iterable, allow_self_pair=False, sortk
                     res.append(sorted_tuple(elemA, elemB, key=sortkey))
                     seen.add(tup)
     return res
+
+
+def normalize(wd: str):
+    return ''.join([ch for ch in wd if ch.isalnum()]).upper()
