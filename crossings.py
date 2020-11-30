@@ -8,7 +8,7 @@ from utils import pairwise_combinations, sorted_tuple
 def find_all_multicrossings(wds: List[str]) -> Set[Multicrossing]:
     wordlist = WordList(wds)
     result = set()
-    for len_m, len_n in wordlist.wds_of_len_m_and_n(wds):
+    for len_m, len_n in wordlist.wds_of_len_m_and_n():
         result.update(find_multicrossings(len_m, len_n))
     return result
 

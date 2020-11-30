@@ -1,7 +1,7 @@
 import string
 from typing import List, Set
 
-from crossings import multicrossings_from_xpoint_groups, find_pairs, get_reciprocal_xpoints, group_by_xpoint, xpoints_for_word_pair
+from crossings import find_all_multicrossings, find_pairs, get_reciprocal_xpoints, group_by_xpoint, multicrossings_from_xpoint_groups, xpoints_for_word_pair
 from types_ import Multicrossing, WordPair, CrossingPoint, XpointGroups
 
 import pytest
@@ -77,8 +77,20 @@ class TestCrossingsFromXpointGroups:
         actual = multicrossings_from_xpoint_groups(grps)
         assert expected == set(actual)  # order doesn't matter
 
+    @staticmethod
+    def random_pairs(m: int, n: int, num_pairs: int) -> List[WordPair]:
+        """Test util to generate unique word-pairs."""
+        if num_pairs > 13:
+            raise Exception('why are you generating that many pairs?? There\'s only so much alphabet.')
+
+        res = []
+        letters = [l for l in string.ascii_lowercase]
+        for i in range(num_pairs):
+            res.append(WordPair(letters.pop(0) * m, letters.pop(0) * n))
+        return res
+
     def test_no_crossings(self):
-        pairs = random_pairs(7, 5, 3)
+        pairs = self.random_pairs(7, 5, 3)
 
         xpoint_groups = XpointGroups({
             (0, 0): [pairs[0]],  # recip. (6, 4) (DNE)
@@ -91,7 +103,7 @@ class TestCrossingsFromXpointGroups:
         self.assert_crossings(xpoint_groups, expected)
 
     def test_one_crossing(self):
-        pairs = random_pairs(7, 5, 2)
+        pairs = self.random_pairs(7, 5, 2)
 
         xpoint_groups = XpointGroups({
             (0, 0): [pairs[0]],
@@ -106,7 +118,7 @@ class TestCrossingsFromXpointGroups:
         self.assert_crossings(xpoint_groups, expected)
 
     def test_symmetrical_crossing_but_no_dupes(self):
-        pairs = random_pairs(7, 5, 2)
+        pairs = self.random_pairs(7, 5, 2)
 
         xpoint_groups = XpointGroups({
             (3, 2): [pairs[0], pairs[1]],
@@ -119,7 +131,7 @@ class TestCrossingsFromXpointGroups:
         self.assert_crossings(xpoint_groups, expected)
 
     def test_combinatorics_two_by_one(self):
-        pairs = random_pairs(5, 4, 3)
+        pairs = self.random_pairs(5, 4, 3)
 
         xpoint_groups = XpointGroups({
             (0, 1): [pairs[0]],
@@ -135,7 +147,7 @@ class TestCrossingsFromXpointGroups:
         self.assert_crossings(xpoint_groups, expected)
 
     def test_combinatorics_two_by_two(self):
-        pairs = random_pairs(5, 4, 4)
+        pairs = self.random_pairs(5, 4, 4)
 
         xpoint_groups = XpointGroups({
             (0, 1): [pairs[0], pairs[1]],
@@ -153,13 +165,34 @@ class TestCrossingsFromXpointGroups:
         self.assert_crossings(xpoint_groups, expected)
 
 
-def random_pairs(m: int, n: int, num_pairs: int) -> List[WordPair]:
-    """Test util to generate unique word-pairs."""
-    if num_pairs > 13:
-        raise Exception('why are you generating that many pairs?? There\'s only so much alphabet.')
+class TestFindAllMulticrossings:
+    def test_simple(self):
+        given = ['ABCDE', 'FGHIJ', 'ZDZZZZ', 'ZZZZGZ']
+        expected = {
+            Multicrossing(
+                (WordPair('ZDZZZZ', 'ABCDE'), WordPair('ZZZZGZ', 'FGHIJ')),
+                ((1, 3), (4, 1))
+            )
+        }
+        actual = find_all_multicrossings(given)
 
-    res = []
-    letters = [l for l in string.ascii_lowercase]
-    for i in range(num_pairs):
-        res.append(WordPair(letters.pop(0) * m, letters.pop(0) * n))
-    return res
+        assert expected == actual
+
+    def test_no_valid_multicrossings(self):
+        given = ['ABCDE', 'fghij', 'klmn', 'opqr']
+        expected = set()
+        actual = find_all_multicrossings(given)
+
+        assert expected == actual
+
+    def test_normalized(self):
+        given = ['some CLUE', 'clue-again', 'other clue!', '"next clue"']
+        expected = {
+            Multicrossing(
+                (WordPair('CLUEAGAIN', 'SOMECLUE'), WordPair('OTHERCLUE', 'NEXTCLUE')),
+                ((3, 3), (5, 4))
+            )
+        }
+        actual = find_all_multicrossings(given)
+
+        assert expected == actual
