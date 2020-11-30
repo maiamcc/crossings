@@ -22,19 +22,38 @@ class TestWordPair:
 
 
 class TestWordList:
-    def test_group_by_len(self):
-        given = ['a', 'b', 'ccc', 'dd', 'ee', 'fff', 'ggggg', 'h']
-        expected = [
-            WordList(['a', 'b', 'h']),
-            WordList(['dd', 'ee']),
-            WordList(['ccc', 'fff']),
-            WordList(['ggggg']),
-        ]
+    given = ['a', 'b', 'ccc', 'dd', 'ee', 'fff', 'ggggg', 'h']
+    len1 = WordList(['a', 'b', 'h'])
+    len2 = WordList(['dd', 'ee'])
+    len3 = WordList(['ccc', 'fff'])
+    len5 = WordList(['ggggg'])
 
-        wd_list = WordList(given)
+    def test_group_by_len(self):
+        expected = [self.len1, self.len2, self.len3, self.len5]
+
+        wd_list = WordList(self.given)
         actual = wd_list.group_by_len()
 
         assert expected == actual
 
-    def wds_of_len_m_and_n(self):
-        pass
+    def test_wds_of_len_m_and_n(self):
+        expected = [
+            # longer words come first
+            (self.len1, self.len1),
+            (self.len2, self.len1),
+            (self.len3, self.len1),
+            (self.len5, self.len1),
+
+            (self.len2, self.len2),
+            (self.len3, self.len2),
+            (self.len5, self.len2),
+
+            (self.len3, self.len3),
+            (self.len5, self.len3),
+
+            (self.len5, self.len5),
+        ]
+        wd_list = WordList(self.given)
+        actual = wd_list.wds_of_len_m_and_n()
+
+        assert expected == actual

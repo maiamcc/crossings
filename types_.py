@@ -1,7 +1,7 @@
 from collections import defaultdict
-from typing import Generator, List, Tuple
+from typing import List, Tuple
 
-from utils import sorted_tuple
+from utils import pairwise_combinations, sorted_tuple
 
 
 class WordPair(tuple):
@@ -49,6 +49,10 @@ class Multicrossing:
 class WordList(list):
     """A list of words (i.e. List[str])."""
 
+    def __hash__(self): return str(self).__hash__()  # ugh I hate it.
+
+    def __eq__(self, other): return self.__hash__() == other.__hash__()
+
     def group_by_len(self) -> List['WordList']:
         """Given a list of words, return a list of lists of words,
         where each list contains all the words of a given length."""
@@ -58,15 +62,16 @@ class WordList(list):
 
         return [WordList(d[n]) for n in sorted(d.keys())]
 
-    def wds_of_len_m_and_n(self) -> Generator[Tuple['WordList', 'WordList'], None, None]:
+    def wds_of_len_m_and_n(self) -> List[Tuple['WordList', 'WordList']]:
         """
             Given a list of words, group by length and yield all possible pairwise
             combinations of groups.
         """
         wds_by_len = self.group_by_len()
 
-        # all possible pairwise combinations
-        pass
+        return pairwise_combinations(wds_by_len, wds_by_len,
+                                     allow_self_pair=True,  # can pair the same wordlist with itself
+                                     sortkey=lambda x: -len(x[0]))  # order with longer words first
 
 
 CrossingPoint = Tuple[int, int]
